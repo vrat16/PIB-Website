@@ -1,0 +1,304 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --color-primary: #0b3558;
+    --color-primary-dark: #072238;
+    --color-primary-light: #164e7c;
+    --color-accent-saffron: #ea580c;
+    --color-accent-green: #15803d;
+    --color-accent-gold: #b45309;
+    --color-bg-base: #f8fafc;
+    --color-surface: #ffffff;
+    --color-text-main: #0f172a;
+    --color-text-muted: #475569;
+    --color-border: #e2e8f0;
+    --font-scale: 1;
+  }
+
+  /* 1. Official Dark Mode */
+  html.dark {
+    color-scheme: dark;
+    --color-primary: #38bdf8;
+    --color-primary-dark: #0284c7;
+    --color-primary-light: #7dd3fc;
+    --color-accent-saffron: #fb923c;
+    --color-accent-green: #4ade80;
+    --color-accent-gold: #fbbf24;
+    --color-bg-base: #0b1120;
+    --color-surface: #111827;
+    --color-text-main: #f8fafc;
+    --color-text-muted: #94a3b8;
+    --color-border: #1e293b;
+  }
+
+  /* 2. High Contrast Dark Theme (WCAG AAA) */
+  html.pib-hc {
+    color-scheme: dark;
+    --color-primary: #facc15;
+    --color-primary-dark: #eab308;
+    --color-primary-light: #fef08a;
+    --color-accent-saffron: #fb923c;
+    --color-accent-green: #4ade80;
+    --color-accent-gold: #facc15;
+    --color-bg-base: #000000;
+    --color-surface: #0a0a0a;
+    --color-text-main: #ffff00;
+    --color-text-muted: #fef08a;
+    --color-border: #facc15;
+  }
+
+  /* 3. Warm Parchment / Yellow Theme */
+  html.pib-theme-yellow {
+    color-scheme: light;
+    --color-primary: #78350f;
+    --color-primary-dark: #451a03;
+    --color-primary-light: #92400e;
+    --color-accent-saffron: #c2410c;
+    --color-accent-green: #166534;
+    --color-accent-gold: #854d0e;
+    --color-bg-base: #faf4e4;
+    --color-surface: #fffef7;
+    --color-text-main: #292524;
+    --color-text-muted: #57534e;
+    --color-border: #e7dab7;
+  }
+
+  /* 4. Eco Green Theme */
+  html.pib-theme-green {
+    color-scheme: light;
+    --color-primary: #14532d;
+    --color-primary-dark: #052e16;
+    --color-primary-light: #166534;
+    --color-accent-saffron: #d97706;
+    --color-accent-green: #15803d;
+    --color-accent-gold: #ca8a04;
+    --color-bg-base: #f0fdf4;
+    --color-surface: #ffffff;
+    --color-text-main: #064e3b;
+    --color-text-muted: #166534;
+    --color-border: #bbf7d0;
+  }
+
+  /* Font Scaling Options */
+  html.font-large {
+    font-size: 112.5%; /* 18px base */
+  }
+
+  html.font-xlarge {
+    font-size: 125%; /* 20px base */
+  }
+
+  body {
+    background-color: var(--color-bg-base);
+    color: var(--color-text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+/* -------------------------------------------------------------
+   EXPLICIT THEME OVERRIDES TO ENSURE 100% INSTANT VISIBLE CHANGE
+   ------------------------------------------------------------- */
+
+/* Dark Mode Overrides */
+html.dark body {
+  background-color: #0b1120 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bg-white {
+  background-color: #111827 !important;
+}
+
+html.dark .bg-slate-50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+html.dark .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-800 {
+  color: #e2e8f0 !important;
+}
+
+html.dark .text-slate-700 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-600 {
+  color: #94a3b8 !important;
+}
+
+html.dark .border-slate-200 {
+  border-color: #1e293b !important;
+}
+
+html.dark .border-slate-300 {
+  border-color: #334155 !important;
+}
+
+/* High Contrast Theme Overrides (WCAG AAA) */
+html.pib-hc body {
+  background-color: #000000 !important;
+  color: #ffff00 !important;
+}
+
+html.pib-hc .bg-white,
+html.pib-hc .bg-slate-50,
+html.pib-hc .bg-slate-100,
+html.pib-hc .bg-slate-200 {
+  background-color: #0a0a0a !important;
+  border-color: #facc15 !important;
+  color: #ffff00 !important;
+}
+
+html.pib-hc h1,
+html.pib-hc h2,
+html.pib-hc h3,
+html.pib-hc h4,
+html.pib-hc h5,
+html.pib-hc h6,
+html.pib-hc p,
+html.pib-hc span,
+html.pib-hc li,
+html.pib-hc label {
+  color: #ffff00 !important;
+}
+
+html.pib-hc .text-slate-500,
+html.pib-hc .text-slate-400,
+html.pib-hc .text-slate-600 {
+  color: #fef08a !important;
+}
+
+html.pib-hc a {
+  color: #38bdf8 !important;
+  text-decoration: underline !important;
+}
+
+html.pib-hc button {
+  border-color: #facc15 !important;
+}
+
+html.pib-hc .border-slate-200,
+html.pib-hc .border-slate-300,
+html.pib-hc .border-slate-800 {
+  border-color: #facc15 !important;
+}
+
+/* Warm Parchment Overrides */
+html.pib-theme-yellow body {
+  background-color: #faf4e4 !important;
+  color: #292524 !important;
+}
+
+html.pib-theme-yellow .bg-white {
+  background-color: #fffef7 !important;
+  border-color: #e7dab7 !important;
+}
+
+html.pib-theme-yellow .bg-slate-50 {
+  background-color: #f4ecda !important;
+}
+
+html.pib-theme-yellow .bg-slate-100 {
+  background-color: #ede2c9 !important;
+}
+
+html.pib-theme-yellow .text-slate-900 {
+  color: #292524 !important;
+}
+
+html.pib-theme-yellow .border-slate-200 {
+  border-color: #e7dab7 !important;
+}
+
+/* Eco Green Overrides */
+html.pib-theme-green body {
+  background-color: #f0fdf4 !important;
+  color: #064e3b !important;
+}
+
+html.pib-theme-green .bg-white {
+  background-color: #ffffff !important;
+  border-color: #bbf7d0 !important;
+}
+
+html.pib-theme-green .bg-slate-50 {
+  background-color: #ecfdf5 !important;
+}
+
+html.pib-theme-green .bg-slate-100 {
+  background-color: #d1fae5 !important;
+}
+
+html.pib-theme-green .text-slate-900 {
+  color: #064e3b !important;
+}
+
+html.pib-theme-green .border-slate-200 {
+  border-color: #bbf7d0 !important;
+}
+
+/* Custom layout container */
+.pib-container {
+  width: 100%;
+  max-width: 1320px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .pib-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .pib-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Tricolor Top Stripe */
+.tricolor-stripe {
+  height: 4px;
+  background: linear-gradient(90deg, #ff9933 0%, #ff9933 33.3%, #ffffff 33.3%, #ffffff 66.6%, #138808 66.6%, #138808 100%);
+}
+
+/* Government Stamp Badge */
+.gov-stamp {
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Print Stylesheet integration */
+@media print {
+  header, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}
