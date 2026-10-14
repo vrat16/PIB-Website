@@ -410,6 +410,31 @@ export const GEMINI_API_KEY = (import.meta as any).env?.VITE_GEMINI_API_KEY ||
   (typeof atob !== 'undefined' ? atob('QVEuQWI4Uk42S1VacC1PREJfbzJTVVhtRzV3Mm11Y2ExOEVrbEF3eVZKNGlOdE1ieFpKWkE=') : '');
 
 /**
+ * Normalizes raw AI output to guarantee a clean, structured List View.
+ * Converts unformatted inline asterisk separators (* **Ministry:**) into proper linebreaks and bullets,
+ * ensures numbered announcements are partitioned into distinct blocks, and cleans malformed markdown.
+ */
+export function normalizeAssistantContent(raw: string): string {
+  if (!raw) return '';
+  let text = raw;
+
+  // 1. Separate numbered announcements into distinct blocks without matching years (e.g. 2026.)
+  text = text.replace(/(?<=\S)\s+(?=\*\*\d{1,2}\.|\b\d{1,2}\.\s+(?:\*\*|[A-Z]))/g, '\n\n');
+
+  // 2. Turn inline single-asterisk bullets (e.g. "Notification** * **Ministry:**") into separate bullet lines
+  text = text.replace(/(?<=\S)\s+\*(?!\*)\s+/g, '\n- ');
+
+  // 3. Strip accidental leading bullet on numbered items (e.g. "* **1. Announcement" -> "1. **Announcement")
+  text = text.replace(/^\s*[-*]\s+(\*\*\d{1,2}\.)/gm, '$1');
+  text = text.replace(/^\s*[-*]\s+(\d{1,2}\.\s+\*\*)/gm, '$1');
+
+  // 4. Ensure headers have clean newlines
+  text = text.replace(/([^\n])\s*(#{2,4}\s+)/g, '$1\n\n$2');
+
+  return text.trim();
+}
+
+/**
  * Asynchronous AI Assistant processor that connects directly to the live Google Gemini API
  * using the official API key, grounded in verified Press Information Bureau releases.
  * Seamlessly falls back to the local grounded knowledge engine if offline or rate limited.
@@ -445,11 +470,21 @@ ${r.keyFigures && r.keyFigures.length > 0 ? 'Official Figures: ' + r.keyFigures.
 
     const systemInstruction = `You are the official PIB AI Assistant for the Press Information Bureau (PIB), Government of India.
 Your mission is to provide accurate, authoritative, respectful, editorial government information to citizens, students, and journalists.
-Grounding Rules:
-- Answer based strictly on official Government of India releases, schemes, and policy directives.
-- When citing figures, dates, or announcements, explicitly mention the nodal Ministry and PRID.
-- Use clear Markdown formatting with bold headers, bullet lists, and summary takeaways.
+
+CRITICAL FORMATTING MANDATE (LIST VIEW REQUIRED):
+- If there is substantial information, multiple updates, policies, vacancies, or announcements: ALWAYS present the content in a structured, numbered LIST VIEW.
+- Format each major topic or announcement as a separate numbered item:
+  1. **[Title / Announcement Name]**
+  2. **[Title / Announcement Name]**
+- Under each numbered announcement, list ALL metadata attributes and details on their OWN separate indented bullet lines:
+  - **Ministry:** [Ministry Name]
+  - **PRID:** [PRID Number] | **Date:** [Date]
+  - **Key Details:** [Concise factual summary]
+  - **Eligibility / Figures / Breakdown:** [Key metrics]
+- STRICT NEGATIVE CONSTRAINT: NEVER cram multiple bullet points or asterisks onto the same line (e.g. "Title * Ministry * PRID" is STRICTLY FORBIDDEN). Every bullet or metadata point MUST start on a NEW line.
+- If there is extensive or dense content, break it down into clean bulleted list items so citizens and users can easily read it in a compact list view.
 - Avoid political bias; maintain neutral editorial government tone.
+- Ground all facts strictly in official Government of India releases.
 
 Verified PIB Gazette Releases in Context:
 ${releaseContext || 'General PIB government database'}`;
@@ -489,7 +524,7 @@ ${releaseContext || 'General PIB government database'}`;
         id: `msg-${Date.now()}`,
         sender: 'assistant',
         timestamp: new Date().toISOString(),
-        text: candidateText,
+        text: normalizeAssistantContent(candidateText),
         groundedSourceIds: relevantReleases.map(r => r.id),
         sourceCitations: relevantReleases.map(r => ({
           id: r.id,

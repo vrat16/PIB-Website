@@ -63,7 +63,7 @@ export const FloatingChatbotFab: React.FC = () => {
     <>
       {/* Floating Chat Modal Window */}
       {isOpen && (
-        <div className="fixed bottom-22 right-4 sm:right-6 z-50 w-[92vw] sm:w-[400px] h-[540px] max-h-[80vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-22 right-4 sm:right-6 z-50 w-[94vw] sm:w-[440px] md:w-[460px] h-[580px] max-h-[85vh] bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
           {/* Header */}
           <div className="bg-[#0b3558] text-white p-3.5 flex items-center justify-between border-b border-sky-900">
             <div className="flex items-center gap-2.5">

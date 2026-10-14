@@ -8,6 +8,7 @@ import {
 import { EmblemOfIndia } from '../brand/EmblemOfIndia';
 import type { AssistantMessage } from '../../types';
 import { toggleSaveRelease } from '../../services/bookmarkService';
+import { normalizeAssistantContent } from '../../services/assistantService';
 
 interface AssistantMessageViewProps {
   message: AssistantMessage;
@@ -20,6 +21,7 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const [savedSources, setSavedSources] = useState<Record<string, boolean>>({});
+  const [viewMode, setViewMode] = useState<'list' | 'detailed'>('list');
 
   const handleCopy = () => {
     navigator.clipboard.writeText(message.text);
@@ -34,33 +36,37 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
 
   // Helper parser for structured blocks in clean List View
   const renderFormattedContent = (content: string) => {
-    const blocks = content.split('\n\n');
+    const normalized = normalizeAssistantContent(content);
+    const blocks = normalized.split('\n\n');
 
     return blocks.map((block, idx) => {
       const trimmed = block.trim();
+      if (!trimmed) return null;
 
       // Heading 3
       if (trimmed.startsWith('### ')) {
+        const titleText = trimmed.replace(/^###\s+/, '').replace(/^\*\*|\*\*$/g, '');
         return (
           <h3 
             key={idx} 
-            className="text-base font-bold font-serif text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-1.5 mt-3 mb-2 flex items-center gap-2"
+            className="text-sm sm:text-base font-bold font-serif text-slate-900 dark:text-white border-b border-slate-200 dark:border-slate-800 pb-1.5 mt-2.5 mb-2 flex items-center gap-2"
           >
-            <span className="w-1.5 h-4 bg-[#0b3558] dark:bg-sky-400 rounded-full inline-block" />
-            <span>{trimmed.replace('### ', '')}</span>
+            <span className="w-1.5 h-4 bg-[#0b3558] dark:bg-sky-400 rounded-full inline-block shrink-0" />
+            <span>{titleText}</span>
           </h3>
         );
       }
 
       // Heading 4
       if (trimmed.startsWith('#### ')) {
+        const titleText = trimmed.replace(/^####\s+/, '').replace(/^\*\*|\*\*$/g, '');
         return (
           <h4 
             key={idx} 
-            className="text-sm font-bold text-[#0b3558] dark:text-sky-300 mt-3 mb-1.5 flex items-center gap-1.5"
+            className="text-xs sm:text-sm font-bold text-[#0b3558] dark:text-sky-300 mt-2.5 mb-1.5 flex items-center gap-1.5"
           >
             <span className="text-amber-500 font-bold">•</span>
-            <span>{trimmed.replace('#### ', '')}</span>
+            <span>{titleText}</span>
           </h4>
         );
       }
@@ -71,7 +77,7 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
         return (
           <div 
             key={idx} 
-            className="my-3 p-3.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-500 text-xs md:text-sm text-amber-900 dark:text-amber-100 flex items-start gap-2.5 shadow-2xs"
+            className="my-2.5 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/40 border-l-4 border-amber-500 text-xs text-amber-900 dark:text-amber-100 flex items-start gap-2.5 shadow-2xs"
           >
             <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
             <div className="leading-relaxed">
@@ -85,7 +91,7 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
       if (trimmed.startsWith('|') && trimmed.includes('\n|')) {
         const rows = trimmed.split('\n').filter(r => r.trim().length > 0);
         return (
-          <div key={idx} className="overflow-x-auto my-3 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
+          <div key={idx} className="overflow-x-auto my-2.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-2xs">
             <table className="w-full text-xs text-left border-collapse">
               <thead>
                 {rows.slice(0, 1).map((r, rIdx) => {
@@ -93,7 +99,7 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
                   return (
                     <tr key={rIdx} className="bg-[#0b3558] text-white">
                       {cells.map((cell, cIdx) => (
-                        <th key={cIdx} className="p-2.5 font-semibold border-b border-sky-800">
+                        <th key={cIdx} className="p-2 font-semibold border-b border-sky-800">
                           {cell.trim()}
                         </th>
                       ))}
@@ -108,7 +114,7 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
                   return (
                     <tr key={rIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors">
                       {cells.map((cell, cIdx) => (
-                        <td key={cIdx} className="p-2.5 text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800 last:border-r-0">
+                        <td key={cIdx} className="p-2 text-slate-800 dark:text-slate-200 border-r border-slate-100 dark:border-slate-800 last:border-r-0">
                           {cell.trim()}
                         </td>
                       ))}
@@ -121,19 +127,67 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
         );
       }
 
-      // Bullet / Numbered List
-      if (trimmed.startsWith('- ') || trimmed.startsWith('* ') || /^\d+\.\s/.test(trimmed)) {
-        const lines = trimmed.split('\n');
+      // Numbered Announcement Card (List View for releases, updates, vacancies)
+      const isNumberedCard = /^(\*\*\d{1,2}\.|\d{1,2}\.\s+\*\*|\d{1,2}\.\s+[A-Za-z])/.test(trimmed);
+      if (isNumberedCard) {
+        const lines = trimmed.split('\n').filter(l => l.trim().length > 0);
+        const firstLine = lines[0];
+        const subLines = lines.slice(1);
+
+        const numMatch = firstLine.match(/\b(\d{1,2})\./);
+        const itemNum = numMatch ? numMatch[1] : '•';
+        const title = firstLine
+          .replace(/^\*+\s*|\s*\*+$/g, '')
+          .replace(/^\d{1,2}\.\s*|\*\*\d{1,2}\.\s*/, '')
+          .replace(/\*+/g, '')
+          .trim();
+
         return (
-          <ul key={idx} className="space-y-2 my-2.5 pl-1 divide-y divide-slate-100 dark:divide-slate-800/60">
+          <div 
+            key={idx} 
+            className="my-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-850/60 shadow-2xs space-y-2.5 transition-all hover:border-slate-300 dark:hover:border-slate-700"
+          >
+            {/* Header with Number Pill in List View */}
+            <div className="flex items-start gap-2.5">
+              <span className="w-5 h-5 rounded-md bg-[#0b3558] text-amber-400 flex items-center justify-center font-bold text-[11px] flex-shrink-0 mt-0.5 shadow-2xs">
+                {itemNum}
+              </span>
+              <h4 className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-snug">
+                {title}
+              </h4>
+            </div>
+
+            {/* Sub-item metadata list */}
+            {subLines.length > 0 && (
+              <ul className="pl-7 space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
+                {subLines.map((sLine, sIdx) => {
+                  const cleanLine = sLine.replace(/^[-*]\s+/, '');
+                  return (
+                    <li key={sIdx} className="flex items-start gap-2 leading-relaxed">
+                      <span className="text-amber-500 font-bold shrink-0 mt-0.5">•</span>
+                      <span className="flex-1" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cleanLine) }} />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        );
+      }
+
+      // Standard Bullet List
+      if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+        const lines = trimmed.split('\n').filter(l => l.trim().length > 0);
+        return (
+          <ul key={idx} className="space-y-1.5 my-2.5 pl-1 divide-y divide-slate-100 dark:divide-slate-800/60">
             {lines.map((line, lIdx) => {
-              const cleaned = line.replace(/^[-*]\s+|\d+\.\s+/, '');
+              const cleaned = line.replace(/^[-*]\s+/, '');
               return (
-                <li key={lIdx} className="pt-1.5 first:pt-0 flex items-start gap-2.5 text-xs md:text-sm text-slate-800 dark:text-slate-200">
-                  <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0b3558] dark:text-sky-300 flex items-center justify-center font-bold text-[10px] flex-shrink-0 mt-0.5 border border-slate-200 dark:border-slate-700">
+                <li key={lIdx} className="pt-1.5 first:pt-0 flex items-start gap-2 text-xs sm:text-sm text-slate-800 dark:text-slate-200">
+                  <span className="w-4 h-4 rounded-full bg-slate-100 dark:bg-slate-800 text-[#0b3558] dark:text-sky-300 flex items-center justify-center font-bold text-[9px] flex-shrink-0 mt-0.5 border border-slate-200 dark:border-slate-700">
                     {lIdx + 1}
                   </span>
-                  <span className="leading-relaxed" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cleaned) }} />
+                  <span className="leading-relaxed flex-1" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(cleaned) }} />
                 </li>
               );
             })}
@@ -141,11 +195,34 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
         );
       }
 
+      // If text has heavy content and viewMode is 'list', split multi-sentence paragraphs into clean List View
+      if (viewMode === 'list' && trimmed.length > 160) {
+        const sentences = trimmed.split(/(?<=[.?!])\s+(?=[A-Z0-9])/).filter(s => s.trim().length > 0);
+        if (sentences.length >= 2) {
+          return (
+            <div key={idx} className="my-2.5 p-3 rounded-xl bg-slate-50/60 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800 space-y-1.5">
+              <div className="text-[10px] uppercase font-bold text-slate-500 tracking-wider flex items-center gap-1 mb-1">
+                <ListFilter className="w-3 h-3 text-[#0b3558] dark:text-sky-400" />
+                <span>Executive Summary (List View)</span>
+              </div>
+              <ul className="space-y-1.5 pl-1">
+                {sentences.map((sent, sIdx) => (
+                  <li key={sIdx} className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 flex items-start gap-2 leading-relaxed">
+                    <span className="text-[#0b3558] dark:text-sky-400 font-bold shrink-0 mt-0.5">•</span>
+                    <span className="flex-1" dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(sent) }} />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+      }
+
       // Regular Paragraph
       return (
         <p 
           key={idx} 
-          className="text-xs md:text-sm text-slate-800 dark:text-slate-200 leading-relaxed my-2"
+          className="text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed my-2"
           dangerouslySetInnerHTML={{ __html: formatInlineMarkdown(trimmed) }}
         />
       );
@@ -161,43 +238,55 @@ export const AssistantMessageView: React.FC<AssistantMessageViewProps> = ({
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
-      {/* 1. Official Header Banner with List View Indicator */}
-      <div className="bg-slate-100/90 dark:bg-slate-950 px-4 py-2.5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+      {/* 1. Official Header Banner with Interactive List View Toggle */}
+      <div className="bg-slate-100/90 dark:bg-slate-950 px-3.5 py-2 sm:px-4 sm:py-2.5 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-[#0b3558] text-white flex items-center justify-center p-0.5">
+          <div className="w-6 h-6 rounded bg-[#0b3558] text-white flex items-center justify-center p-0.5 shrink-0">
             <EmblemOfIndia size={18} />
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-[#0b3558] dark:text-sky-400">
-              PIB Executive Policy Briefing
+              PIB Policy Briefing
             </span>
-            <span className="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-700 flex items-center gap-1">
+            <span className="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 font-bold px-2 py-0.2 rounded-full border border-emerald-300 dark:border-emerald-700 flex items-center gap-1">
               <ShieldCheck className="w-3 h-3" />
-              <span>Grounded Record</span>
+              <span>Grounded</span>
             </span>
           </div>
         </div>
 
-        {/* Toolbar with List View indicator and Copy */}
-        <div className="flex items-center gap-2">
-          <span className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded bg-slate-200/70 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-semibold border border-slate-300 dark:border-slate-700">
+        {/* Toolbar with List View interactive toggle and Copy */}
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setViewMode(prev => prev === 'list' ? 'detailed' : 'list')}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold border transition-colors cursor-pointer ${
+              viewMode === 'list'
+                ? 'bg-sky-100 text-[#0b3558] border-sky-300 dark:bg-sky-950 dark:text-sky-300 dark:border-sky-800'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50'
+            }`}
+            title="Toggle List View formatting"
+          >
             <ListFilter className="w-3 h-3 text-[#0b3558] dark:text-sky-400" />
             <span>List View</span>
-          </span>
+            {viewMode === 'list' && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            )}
+          </button>
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-xs hover:bg-slate-50 cursor-pointer transition-colors"
+            className="flex items-center gap-1 px-2 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[11px] hover:bg-slate-50 cursor-pointer transition-colors"
             title="Copy briefing to clipboard"
           >
             {copied ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3" />}
-            <span>{copied ? 'Copied' : 'Copy'}</span>
+            <span className="hidden sm:inline">{copied ? 'Copied' : 'Copy'}</span>
           </button>
         </div>
       </div>
 
       {/* 2. Structured Content Body in List View */}
-      <div className="p-5 md:p-6 space-y-4">
+      <div className="p-3.5 sm:p-5 md:p-6 space-y-3.5 sm:space-y-4">
         {/* Extracted Key Figures in List View */}
         {message.extractedFigures && message.extractedFigures.length > 0 && (
           <div className="rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-50/60 dark:bg-slate-800/50">
