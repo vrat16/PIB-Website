@@ -89,7 +89,7 @@ export const ReleaseCard: React.FC<ReleaseCardProps> = ({
         variant === 'featured' ? 'ring-1 ring-amber-400/60 dark:ring-amber-500/40 bg-gradient-to-b from-amber-50/20 to-white dark:from-slate-900 dark:to-slate-900' : ''
       } ${className}`}
     >
-      <div className="p-5">
+      <div className="p-4 sm:p-5">
         {/* Top Meta Header: Ministry, Category & Bookmark Button */}
         <div className="flex items-center justify-between gap-2 mb-2.5">
           <Link
@@ -112,13 +112,13 @@ export const ReleaseCard: React.FC<ReleaseCardProps> = ({
               onClick={handleBookmarkToggle}
               title={isSaved ? 'Saved in your reading list (Click to remove)' : 'Save release to reading list'}
               aria-label={isSaved ? 'Remove saved release' : 'Save release'}
-              className={`p-1 rounded-md transition-colors cursor-pointer ml-1 ${
+              className={`p-2 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded-md transition-colors cursor-pointer ml-1 ${
                 isSaved 
                   ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-300 dark:border-amber-700' 
                   : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent'
               }`}
             >
-              <Bookmark className={`w-3.5 h-3.5 ${isSaved ? 'fill-current' : ''}`} />
+              <Bookmark className={`w-4 h-4 sm:w-3.5 sm:h-3.5 ${isSaved ? 'fill-current' : ''}`} />
             </button>
           </div>
         </div>
@@ -150,8 +150,8 @@ export const ReleaseCard: React.FC<ReleaseCardProps> = ({
       </div>
 
       {/* Card Footer: Date, Location, PRID & Action Links */}
-      <div className="px-5 py-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
-        <div className="flex items-center gap-3 flex-wrap">
+      <div className="px-4 sm:px-5 py-3 bg-slate-50 dark:bg-slate-950/60 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2.5 text-xs text-slate-500 dark:text-slate-400">
+        <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
           <span className="flex items-center gap-1 font-medium">
             <Calendar className="w-3.5 h-3.5 text-slate-400" />
             <span>{formattedDate} • {formattedTime}</span>
@@ -171,17 +171,17 @@ export const ReleaseCard: React.FC<ReleaseCardProps> = ({
           <button
             onClick={() => generateReleasePdf(release)}
             title="Download Official Release PDF"
-            className="p-1 rounded text-slate-500 hover:text-[#0b3558] dark:hover:text-sky-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 cursor-pointer"
+            className="p-2 sm:p-1 min-w-[36px] min-h-[36px] sm:min-w-0 sm:min-h-0 flex items-center justify-center rounded text-slate-500 hover:text-[#0b3558] dark:hover:text-sky-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 cursor-pointer"
             aria-label="Download PDF"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           </button>
 
           {/* Ask AI Assistant about this release */}
           <Link
             to={`/assistant?releaseId=${release.id}`}
             title="Ask AI Assistant about this release"
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 dark:hover:bg-amber-900 text-amber-900 dark:text-amber-200 font-semibold text-xs transition-colors"
+            className="flex items-center gap-1 px-2.5 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 rounded bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 dark:hover:bg-amber-900 text-amber-900 dark:text-amber-200 font-semibold text-xs transition-colors"
           >
             <Bot className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
             <span className="hidden sm:inline">{t.common.askAi}</span>
@@ -190,7 +190,7 @@ export const ReleaseCard: React.FC<ReleaseCardProps> = ({
           {/* Full release page */}
           <Link
             to={`/release/${release.id}`}
-            className="flex items-center gap-1 text-[#0b3558] dark:text-sky-400 font-semibold hover:underline"
+            className="flex items-center gap-1 text-[#0b3558] dark:text-sky-400 font-semibold hover:underline min-h-[36px] sm:min-h-0"
           >
             <span>{t.common.readFull}</span>
             <ArrowRight className="w-3.5 h-3.5" />

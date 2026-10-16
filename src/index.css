@@ -302,3 +302,34 @@ html.pib-theme-green .border-slate-200 {
     display: block !important;
   }
 }
+
+/* -------------------------------------------------------------
+   MOBILE ACCESSIBILITY & TOUCH UTILITIES (WCAG 2.1 AA / GIGW)
+   ------------------------------------------------------------- */
+
+/* Safe area inset for modern mobile devices (iPhone home indicator, punch-hole notches) */
+.safe-area-bottom {
+  padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+.safe-area-top {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
+/* Touch friendly minimum sizing */
+@media (pointer: coarse) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Eliminate 300ms mobile tap highlight gray flash */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth kinetic momentum scrolling on iOS */
+.momentum-scroll {
+  -webkit-overflow-scrolling: touch;
+}

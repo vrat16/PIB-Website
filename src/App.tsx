@@ -13,6 +13,7 @@ import { PreferencesPage } from './pages/PreferencesPage';
 import { AboutPage } from './pages/AboutPage';
 import { MediaFacilitationPage } from './pages/MediaFacilitationPage';
 import { FloatingChatbotFab } from './components/assistant/FloatingChatbotFab';
+import { MobileBottomNav } from './components/common/MobileBottomNav';
 import { loadPreferences, applyThemeAndFont } from './services/preferenceService';
 import { ArrowLeft } from 'lucide-react';
 
@@ -28,7 +29,7 @@ export function App() {
       <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-amber-400 selection:text-slate-900">
         <Header />
 
-        <main id="main-content" className="flex-1 focus:outline-hidden" tabIndex={-1}>
+        <main id="main-content" className="flex-1 focus:outline-hidden pb-16 lg:pb-0" tabIndex={-1}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/about" element={<AboutPage />} />
@@ -64,8 +65,11 @@ export function App() {
           </Routes>
         </main>
 
-        {/* Global Floating Chatbot FAB in bottom right corner */}
+        {/* Global Floating Chatbot FAB */}
         <FloatingChatbotFab />
+
+        {/* Accessible Mobile Bottom Navigation Dock (WCAG 2.1 AA / GIGW) */}
+        <MobileBottomNav onOpenAssistant={() => window.dispatchEvent(new CustomEvent('pib_open_assistant'))} />
 
         <Footer />
       </div>

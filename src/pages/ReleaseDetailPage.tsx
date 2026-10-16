@@ -117,11 +117,11 @@ export const ReleaseDetailPage: React.FC = () => {
         {/* Action Buttons: Language, Print, Share, AI Assistant */}
         <div className="flex items-center gap-2 flex-wrap">
           {/* In-Article Language Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-0.5 rounded border border-slate-200 dark:border-slate-700">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 sm:p-0.5 rounded border border-slate-200 dark:border-slate-700 min-h-[36px] sm:min-h-0">
             <Globe className="w-3.5 h-3.5 text-slate-500 ml-1.5" />
             <button
               onClick={() => handleLanguageSwitch('en')}
-              className={`px-2.5 py-0.5 rounded text-[11px] font-bold cursor-pointer transition-colors ${
+              className={`px-2.5 py-1 sm:py-0.5 rounded text-xs sm:text-[11px] font-bold cursor-pointer transition-colors ${
                 inArticleLang === 'en'
                   ? 'bg-[#0b3558] text-white shadow-2xs'
                   : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -131,7 +131,7 @@ export const ReleaseDetailPage: React.FC = () => {
             </button>
             <button
               onClick={() => handleLanguageSwitch('hi')}
-              className={`px-2.5 py-0.5 rounded text-[11px] font-bold cursor-pointer transition-colors ${
+              className={`px-2.5 py-1 sm:py-0.5 rounded text-xs sm:text-[11px] font-bold cursor-pointer transition-colors ${
                 inArticleLang === 'hi'
                   ? 'bg-[#0b3558] text-white shadow-2xs'
                   : 'text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -148,7 +148,7 @@ export const ReleaseDetailPage: React.FC = () => {
                 setIsSaved(next);
               }
             }}
-            className={`flex items-center gap-1.5 px-3 py-1 rounded border transition-colors cursor-pointer text-xs ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 rounded border transition-colors cursor-pointer text-xs ${
               isSaved
                 ? 'bg-amber-100 dark:bg-amber-950/60 border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-200 font-bold'
                 : 'border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
@@ -161,7 +161,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
           <button
             onClick={() => generateReleasePdf(release)}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-[#0b3558] hover:bg-[#164e7c] text-white font-semibold transition-colors cursor-pointer shadow-2xs text-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 rounded bg-[#0b3558] hover:bg-[#164e7c] text-white font-semibold transition-colors cursor-pointer shadow-2xs text-xs"
             title="Download Official PDF Release"
           >
             <Download className="w-3.5 h-3.5" />
@@ -170,7 +170,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
           <button
             onClick={handleShare}
-            className="flex items-center gap-1.5 px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer text-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer text-xs"
           >
             {copiedToast ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Share2 className="w-3.5 h-3.5" />}
             <span>{copiedToast ? 'URL Copied' : t.common.share}</span>
@@ -178,7 +178,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
           <button
             onClick={handlePrint}
-            className="flex items-center gap-1.5 px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer text-xs"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer text-xs"
           >
             <Printer className="w-3.5 h-3.5" />
             <span>{t.common.print}</span>
@@ -186,7 +186,7 @@ export const ReleaseDetailPage: React.FC = () => {
 
           <Link
             to={`/assistant?releaseId=${release.id}`}
-            className="flex items-center gap-1.5 px-3 py-1 rounded bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold transition-colors cursor-pointer shadow-2xs text-xs"
+            className="flex items-center gap-1.5 px-3 py-1.5 sm:py-1 min-h-[36px] sm:min-h-0 rounded bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold transition-colors cursor-pointer shadow-2xs text-xs"
           >
             <Bot className="w-3.5 h-3.5" />
             <span>{t.common.askAi}</span>
@@ -195,7 +195,7 @@ export const ReleaseDetailPage: React.FC = () => {
       </div>
 
       {/* Main Release Article */}
-      <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 md:p-10 shadow-xs space-y-6">
+      <article className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 md:p-10 shadow-xs space-y-6">
         {/* Release Metadata Header */}
         <div className="space-y-3 border-b border-slate-200 dark:border-slate-800 pb-6">
           <div className="flex flex-wrap items-center justify-between gap-2">

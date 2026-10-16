@@ -297,7 +297,7 @@ export const MyPibFeedPage: React.FC = () => {
     <div className="pib-container py-8 max-w-5xl space-y-8" id="main-content">
       {/* Toast Alert */}
       {testSentToast && (
-        <div className="fixed bottom-6 right-6 z-50 p-4 bg-emerald-900 text-white rounded-xl shadow-xl flex items-center gap-3 text-xs border border-emerald-700 animate-in fade-in duration-200">
+        <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 p-4 bg-emerald-900 text-white rounded-xl shadow-xl flex items-center gap-3 text-xs border border-emerald-700 animate-in fade-in duration-200">
           <Check className="w-4 h-4 text-emerald-400" />
           <div>
             <div className="font-bold">Test Bulletin Dispatched!</div>
@@ -309,7 +309,7 @@ export const MyPibFeedPage: React.FC = () => {
       )}
 
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 sm:p-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="p-2 rounded-lg bg-[#0b3558] text-white">

@@ -54,6 +54,28 @@ export const Header: React.FC = () => {
     };
   }, []);
 
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  // Lock body scroll and handle Escape key when mobile menu is open
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
   const toggleLanguage = () => {
     const newLang = preferences.preferredLanguage === 'en' ? 'hi' : 'en';
     savePreferences({ preferredLanguage: newLang });
@@ -102,19 +124,19 @@ export const Header: React.FC = () => {
       <div className="tricolor-stripe" aria-hidden="true" />
 
       {/* 2. Official Citizen Accessibility & Language Bar */}
-      <div className="bg-slate-100 dark:bg-slate-950 text-xs border-b border-slate-200 dark:border-slate-800 py-1.5 px-4">
-        <div className="pib-container flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-slate-100 dark:bg-slate-950 text-xs border-b border-slate-200 dark:border-slate-800 py-1.5 px-2.5 sm:px-4">
+        <div className="pib-container flex items-center justify-between gap-1.5 sm:gap-2">
           {/* Left: Govt Identity & Skip to Content */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3">
             <a 
               href="#main-content" 
-              className="sr-only focus:not-sr-only focus:bg-amber-400 focus:text-slate-900 focus:px-2 focus:py-0.5 focus:rounded text-xs font-semibold"
+              className="sr-only focus:not-sr-only focus:bg-amber-400 focus:text-slate-900 focus:px-2 focus:py-1 focus:rounded text-xs font-semibold z-50 shadow-md"
             >
               Skip to Main Content
             </a>
-            <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-medium">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              <span>भारत सरकार | Government of India</span>
+            <span className="flex items-center gap-1.5 text-slate-700 dark:text-slate-300 font-semibold text-[10.5px] sm:text-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="truncate max-w-[130px] sm:max-w-none">भारत सरकार | Govt of India</span>
             </span>
             <span className="hidden md:inline text-slate-400">|</span>
             <span className="hidden md:flex items-center gap-1 text-slate-500 dark:text-slate-400">
@@ -124,22 +146,23 @@ export const Header: React.FC = () => {
           </div>
 
           {/* Right: Accessibility Controls, Dark/Light Mode, & Language Selector */}
-          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Direct High-Visibility Dark / Light Mode Switch */}
             <button
               onClick={handleToggleDarkMode}
               title={`Switch to ${isDarkMode ? 'Light' : 'Dark'} Mode`}
-              className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-medium transition-colors cursor-pointer shadow-2xs"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-100 font-medium transition-colors cursor-pointer shadow-2xs min-h-[30px]"
+              aria-label={`Toggle Dark/Light Mode (currently ${isDarkMode ? 'dark' : 'light'})`}
             >
               {isDarkMode ? (
                 <>
                   <Sun className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[11px] font-bold">Light Mode</span>
+                  <span className="text-[10px] sm:text-[11px] font-bold hidden xs:inline">Light</span>
                 </>
               ) : (
                 <>
                   <Moon className="w-3.5 h-3.5 text-slate-700" />
-                  <span className="text-[11px] font-bold">Dark Mode</span>
+                  <span className="text-[10px] sm:text-[11px] font-bold hidden xs:inline">Dark</span>
                 </>
               )}
             </button>
@@ -148,15 +171,16 @@ export const Header: React.FC = () => {
             <button
               onClick={handleFontSizeCycle}
               title={`Cycle font size (Current: ${preferences.fontSize})`}
-              className="flex items-center gap-1 px-2 py-0.5 rounded border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-2 py-1 rounded border border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 transition-colors cursor-pointer min-h-[30px]"
+              aria-label={`Current font size ${preferences.fontSize}. Click to cycle.`}
             >
               <Type className="w-3 h-3" />
-              <span className="font-bold">
+              <span className="font-bold text-[10.5px]">
                 {preferences.fontSize === 'normal' ? 'A' : preferences.fontSize === 'large' ? 'A+' : 'A++'}
               </span>
             </button>
 
-            {/* Reading Themes */}
+            {/* Reading Themes (Tablet / Desktop) */}
             <div className="hidden sm:flex items-center gap-1 bg-slate-200/60 dark:bg-slate-800/80 p-0.5 rounded">
               <button
                 onClick={() => handleThemeChange('default')}
@@ -190,10 +214,11 @@ export const Header: React.FC = () => {
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#0b3558] text-white hover:bg-[#164e7c] dark:bg-sky-600 dark:hover:bg-sky-500 font-medium transition-colors cursor-pointer text-xs"
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#0b3558] text-white hover:bg-[#164e7c] dark:bg-sky-600 dark:hover:bg-sky-500 font-semibold transition-colors cursor-pointer text-[11px] sm:text-xs min-h-[30px]"
               title="Toggle English / हिन्दी"
+              aria-label={`Switch language to ${preferences.preferredLanguage === 'en' ? 'Hindi' : 'English'}`}
             >
-              <Globe className="w-3 h-3" />
+              <Globe className="w-3.5 h-3.5" />
               <span>{preferences.preferredLanguage === 'en' ? 'हिन्दी' : 'English'}</span>
             </button>
           </div>
@@ -234,18 +259,20 @@ export const Header: React.FC = () => {
           {/* Mobile Menu Toggle Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-md text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Toggle navigation menu"
+            className="lg:hidden p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer active:scale-95 border border-slate-200 dark:border-slate-800"
+            aria-label={mobileMenuOpen ? 'Close navigation drawer' : 'Open navigation drawer'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-nav-drawer"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? <X className="w-6 h-6 text-rose-500" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* 4. Global Navigation Menu */}
-      <nav className="bg-[#0b3558] dark:bg-slate-950 text-white border-t border-sky-900 dark:border-slate-800">
+      {/* 4. Global Navigation Menu (Desktop) */}
+      <nav className="hidden lg:block bg-[#0b3558] dark:bg-slate-950 text-white border-t border-sky-900 dark:border-slate-800">
         <div className="pib-container">
-          <ul className="hidden lg:flex items-center gap-1 py-1 text-xs font-medium">
+          <ul className="flex items-center gap-1 py-1 text-xs font-medium">
             {navLinks.map((item) => {
               const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
               return (
@@ -271,39 +298,121 @@ export const Header: React.FC = () => {
             })}
           </ul>
         </div>
+      </nav>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden bg-[#072238] dark:bg-slate-900 border-t border-slate-700 py-3 px-4 animate-in slide-in-from-top duration-200">
-            <ul className="flex flex-col gap-1">
-              {navLinks.map((item) => {
-                const isActive = location.pathname === item.to;
-                return (
-                  <li key={item.to}>
+      {/* 5. Accessible Mobile Navigation Slide-Over Drawer */}
+      {mobileMenuOpen && (
+        <>
+          {/* Backdrop Overlay */}
+          <div 
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs transition-opacity lg:hidden animate-in fade-in duration-200" 
+            onClick={() => setMobileMenuOpen(false)}
+            aria-hidden="true"
+          />
+
+          {/* Drawer Container */}
+          <div 
+            id="mobile-nav-drawer"
+            className="fixed inset-y-0 right-0 z-50 w-[86vw] max-w-sm bg-[#072238] dark:bg-slate-950 text-white shadow-2xl flex flex-col justify-between animate-in slide-in-from-right duration-250 lg:hidden border-l border-white/10"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation Drawer"
+          >
+            {/* Drawer Masthead */}
+            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-black/20">
+              <div className="flex items-center gap-2">
+                <span className="p-1 rounded bg-white text-[#0b3558] flex items-center justify-center shadow-xs">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                </span>
+                <div>
+                  <span className="font-bold text-sm font-serif block">पत्र सूचना कार्यालय</span>
+                  <span className="text-[10px] text-amber-300 font-medium tracking-wide">Press Information Bureau</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer"
+                aria-label="Close navigation drawer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Scrollable Navigation Body */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {/* Quick Language & Dark Mode Settings Card */}
+              <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
+                <div className="text-[10.5px] font-bold text-amber-300 uppercase tracking-wider flex items-center justify-between">
+                  <span>Language & Display</span>
+                  <span className="text-slate-400 font-normal">Accessibility</span>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <button
+                    onClick={toggleLanguage}
+                    className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-white font-medium transition-all cursor-pointer min-h-[40px]"
+                    aria-label={`Switch language to ${preferences.preferredLanguage === 'en' ? 'Hindi' : 'English'}`}
+                  >
+                    <Globe className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="truncate">{preferences.preferredLanguage === 'en' ? 'हिन्दी में बदलें' : 'English'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleToggleDarkMode}
+                    className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 active:scale-95 text-white font-medium transition-all cursor-pointer min-h-[40px]"
+                    aria-label={`Toggle ${isDarkMode ? 'Light' : 'Dark'} Mode`}
+                  >
+                    {isDarkMode ? <Sun className="w-3.5 h-3.5 text-amber-400 shrink-0" /> : <Moon className="w-3.5 h-3.5 text-slate-300 shrink-0" />}
+                    <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Navigation Links */}
+              <div className="space-y-1">
+                <div className="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-1">
+                  Portal Navigation
+                </div>
+                {navLinks.map((item) => {
+                  const isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
+                  return (
                     <Link
+                      key={item.to}
                       to={item.to}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`flex items-center justify-between px-3 py-2.5 rounded-md text-sm ${
-                        isActive ? 'bg-sky-600 text-white font-bold' : 'text-slate-200 hover:bg-slate-800'
+                      className={`flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all active:scale-98 min-h-[44px] ${
+                        isActive 
+                          ? 'bg-sky-600 text-white font-bold shadow-sm' 
+                          : 'text-slate-200 hover:bg-white/10 hover:text-white'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        {item.icon && <item.icon className="w-4 h-4" />}
+                      <div className="flex items-center gap-3">
+                        {item.icon && <item.icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-sky-300'}`} />}
                         <span>{item.label}</span>
                       </div>
                       {item.badge && (
-                        <span className="text-[10px] bg-amber-400 text-slate-900 px-1.5 py-0.5 rounded font-bold">
+                        <span className="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-bold">
                           {item.badge}
                         </span>
                       )}
                     </Link>
-                  </li>
-                );
-              })}
-            </ul>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Drawer Footer with Official Helplines */}
+            <div className="p-4 border-t border-white/10 bg-black/30 text-xs text-slate-400 space-y-1.5">
+              <div className="font-semibold text-slate-200 flex items-center justify-between">
+                <span>National Media Centre</span>
+                <span className="text-[10px] text-emerald-400 font-mono">Verified Portal</span>
+              </div>
+              <div className="text-[11px] text-slate-400 leading-snug">
+                7E Raisina Road, New Delhi 110001 • Press Information Bureau, Ministry of Information & Broadcasting
+              </div>
+            </div>
           </div>
-        )}
-      </nav>
+        </>
+      )}
     </header>
   );
 };
